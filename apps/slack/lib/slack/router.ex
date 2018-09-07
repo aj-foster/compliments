@@ -7,11 +7,25 @@ defmodule Slack.Router do
   plug(:match)
   plug(:dispatch)
 
-  post "/webhook" do
+  # Informational endpoint, for someone who finds this application.
+  get "/" do
+    send_resp(conn, 200, """
+    This application provides a `/compliment` command for Slack workspaces.
+
+    If you have questions, please contact AJ Foster.
+    """)
+  end
+
+  # Health check endpoint, to monitor uptime.
+  get "/health" do
+    send_resp(conn, 200, "OK")
+  end
+
     send_resp(conn, 200, "Success")
   end
 
+  # Catch-all for other requests.
   match _ do
-    send_resp(conn, 500, "Error")
+    send_resp(conn, 200, "The command could not be completed (error: invalid route)")
   end
 end
