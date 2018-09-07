@@ -1,18 +1,11 @@
 defmodule Slack do
-  @moduledoc """
-  Documentation for Slack.
-  """
+  use Application
 
-  @doc """
-  Hello world.
+  def start(_type, _args) do
+    children = [
+      Plug.Adapters.Cowboy2.child_spec(scheme: :http, plug: Slack.Router, options: [port: 4000])
+    ]
 
-  ## Examples
-
-      iex> Slack.hello
-      :world
-
-  """
-  def hello do
-    :world
+    Supervisor.start_link(children, strategy: :one_for_one)
   end
 end
