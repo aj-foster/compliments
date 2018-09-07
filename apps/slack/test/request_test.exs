@@ -77,6 +77,22 @@ defmodule Slack.RequestTest do
 
       assert {:error, :invalid_signature} == Request.verify(body, timestamp, signature)
     end
+
+    test "returns error if timestamp is old" do
+      old_time =
+        :os.system_time(:seconds)
+        |> Kernel.-(60 * 5)
+        |> to_string()
+
+      conn =
+        conn(:post, "/", @example_body)
+        |> put_req_header("X-Slack-Request-Timestamp", old_time)
+        |> put_req_header("X-Slack-Signature", @example_signature)
+
+      {body, timestamp, signature} = Request.read_and_parse(conn)
+
+      assert {:error, :timeout} == Request.verify(body, timestamp, signature)
+    end
   end
 
   describe "calculate_hash/2" do

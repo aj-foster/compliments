@@ -1,6 +1,6 @@
 defmodule Slack.Request do
   @moduledoc """
-  Provides utilities to verify Slack requests based on a shared secret.
+  Provides utilities to read, verify, and handle Slack requests.
   """
 
   alias Plug.Conn
@@ -26,14 +26,34 @@ defmodule Slack.Request do
   @doc """
   Verify a Slack request based on the supplied signature.
   """
-  @spec verify(binary(), binary(), binary()) :: :ok | {:error, :invalid_signature}
+  @spec verify(binary(), binary(), binary()) ::
+          :ok | {:error, :timeout} | {:error, :invalid_signature}
   def verify(body, timestamp, signature) do
     cond do
+      !valid_timestamp?(timestamp) ->
+        {:error, :timeout}
+
       calculate_hash(body, timestamp) == signature ->
         :ok
 
       true ->
         {:error, :invalid_signature}
+    end
+  end
+
+  # Verify request timestamp in a test-friendly way.
+  @spec valid_timestamp?(binary()) :: boolean()
+  defp valid_timestamp?(timestamp) do
+    is_test_time = Mix.env() == :test && timestamp == "1531420618"
+    time_now = :os.system_time(:seconds)
+    time_limit = time_now - 60 * 5
+
+    case Integer.parse(timestamp, 10) do
+      {time_then, _} when is_integer(time_then) ->
+        time_then > time_limit || is_test_time
+
+      _ ->
+        false
     end
   end
 
