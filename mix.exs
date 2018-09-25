@@ -15,6 +15,9 @@ defmodule Compliments.MixProject do
   #
   # Run "mix help deps" for examples and options.
   defp deps do
-    []
+    [
+      # Releases
+      {:distillery, "~> 2.0"}
+    ]
   end
 end
