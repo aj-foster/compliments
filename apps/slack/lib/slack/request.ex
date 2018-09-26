@@ -10,8 +10,8 @@ defmodule Slack.Request do
   """
   @spec read_and_parse(Conn.t()) :: {binary(), binary(), binary()} | {:error, term()}
   def read_and_parse(conn) do
-    with [timestamp | _] <- Conn.get_req_header(conn, "X-Slack-Request-Timestamp"),
-         [signature | _] <- Conn.get_req_header(conn, "X-Slack-Signature"),
+    with [timestamp | _] <- Conn.get_req_header(conn, "x-slack-request-timestamp"),
+         [signature | _] <- Conn.get_req_header(conn, "x-slack-signature"),
          {:ok, body, _} <- Conn.read_body(conn) do
       {body, timestamp, signature}
     else
