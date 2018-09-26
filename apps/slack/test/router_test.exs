@@ -58,6 +58,7 @@ defmodule Slack.RouterTest do
     test "returns message when successful" do
       conn =
         conn(:post, "/", @example_body)
+        |> put_req_header("content-type", "application/x-www-form-urlencoded")
         |> put_req_header("x-slack-request-timestamp", @example_timestamp)
         |> put_req_header("x-slack-signature", @example_signature)
         |> Router.call(@opts)
@@ -70,6 +71,7 @@ defmodule Slack.RouterTest do
     test "returns error when missing headers" do
       conn =
         conn(:post, "/", @example_body)
+        |> put_req_header("content-type", "application/x-www-form-urlencoded")
         |> Router.call(@opts)
 
       assert conn.state == :sent
@@ -80,6 +82,7 @@ defmodule Slack.RouterTest do
     test "returns error when incorrectly signed" do
       conn =
         conn(:post, "/", @example_body)
+        |> put_req_header("content-type", "application/x-www-form-urlencoded")
         |> put_req_header("x-slack-request-timestamp", @example_timestamp)
         |> put_req_header("x-slack-signature", @example_signature <> "a")
         |> Router.call(@opts)

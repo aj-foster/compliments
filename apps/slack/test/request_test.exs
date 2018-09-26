@@ -23,9 +23,10 @@ defmodule Slack.RequestTest do
         |> to_string()
 
       conn =
-        conn(:post, "/", @example_body)
-        |> put_req_header("X-Slack-Request-Timestamp", time)
-        |> put_req_header("X-Slack-Signature", @example_signature)
+        conn(:post, "/")
+        |> assign(:raw_body, [@example_body])
+        |> put_req_header("x-slack-request-timestamp", time)
+        |> put_req_header("x-slack-signature", @example_signature)
 
       {body, timestamp, signature} = Request.read_and_parse(conn)
 
@@ -36,8 +37,9 @@ defmodule Slack.RequestTest do
 
     test "returns error if missing timestamp header" do
       conn =
-        conn(:post, "/", @example_body)
-        |> put_req_header("X-Slack-Signature", @example_signature)
+        conn(:post, "/")
+        |> assign(:raw_body, [@example_body])
+        |> put_req_header("x-slack-signature", @example_signature)
 
       assert {:error, :missing_header} == Request.read_and_parse(conn)
     end
@@ -48,8 +50,9 @@ defmodule Slack.RequestTest do
         |> to_string()
 
       conn =
-        conn(:post, "/", @example_body)
-        |> put_req_header("X-Slack-Request-Timestamp", time)
+        conn(:post, "/")
+        |> assign(:raw_body, [@example_body])
+        |> put_req_header("x-slack-request-timestamp", time)
 
       assert {:error, :missing_header} == Request.read_and_parse(conn)
     end
@@ -58,9 +61,10 @@ defmodule Slack.RequestTest do
   describe "verify/3" do
     test "returns :ok if valid" do
       conn =
-        conn(:post, "/", @example_body)
-        |> put_req_header("X-Slack-Request-Timestamp", @example_timestamp)
-        |> put_req_header("X-Slack-Signature", @example_signature)
+        conn(:post, "/")
+        |> assign(:raw_body, [@example_body])
+        |> put_req_header("x-slack-request-timestamp", @example_timestamp)
+        |> put_req_header("x-slack-signature", @example_signature)
 
       {body, timestamp, signature} = Request.read_and_parse(conn)
 
@@ -69,9 +73,10 @@ defmodule Slack.RequestTest do
 
     test "returns error if invalid" do
       conn =
-        conn(:post, "/", @example_body)
-        |> put_req_header("X-Slack-Request-Timestamp", @example_timestamp)
-        |> put_req_header("X-Slack-Signature", @example_signature <> "a")
+        conn(:post, "/")
+        |> assign(:raw_body, [@example_body])
+        |> put_req_header("x-slack-request-timestamp", @example_timestamp)
+        |> put_req_header("x-slack-signature", @example_signature <> "a")
 
       {body, timestamp, signature} = Request.read_and_parse(conn)
 
@@ -85,9 +90,10 @@ defmodule Slack.RequestTest do
         |> to_string()
 
       conn =
-        conn(:post, "/", @example_body)
-        |> put_req_header("X-Slack-Request-Timestamp", old_time)
-        |> put_req_header("X-Slack-Signature", @example_signature)
+        conn(:post, "/")
+        |> assign(:raw_body, [@example_body])
+        |> put_req_header("x-slack-request-timestamp", old_time)
+        |> put_req_header("x-slack-signature", @example_signature)
 
       {body, timestamp, signature} = Request.read_and_parse(conn)
 
