@@ -37,6 +37,19 @@ environment :prod do
   set(include_erts: true)
   set(include_src: false)
   set(cookie: :"!k`]AQ<wPHq55,TpZ{ef)LEE/6|vgw9~Kl]htAD$T.S_)0bD8`WB895,xLE$*vG=")
+
+  # Runtime configuration
+  set(
+    config_providers: [
+      {Mix.Releases.Config.Providers.Elixir, ["${RELEASE_ROOT_DIR}/etc/config.exs"]}
+    ]
+  )
+
+  set(
+    overlays: [
+      {:copy, "rel/config/config.exs", "etc/config.exs"}
+    ]
+  )
 end
 
 # You may define one or more releases in this file.
@@ -45,7 +58,7 @@ end
 # will be used by default
 
 release :compliments do
-  set(version: "0.0.1")
+  set(version: "0.0.2")
 
   set(
     applications: [
