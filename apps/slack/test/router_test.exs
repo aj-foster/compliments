@@ -3,6 +3,7 @@ defmodule Slack.RouterTest do
   use Plug.Test
 
   alias Slack.Router
+  import Mock
 
   @opts Router.init([])
 
@@ -55,41 +56,46 @@ defmodule Slack.RouterTest do
   end
 
   describe "POST /" do
-    test "returns message when successful" do
-      conn =
-        conn(:post, "/", @example_body)
-        |> put_req_header("content-type", "application/x-www-form-urlencoded")
-        |> put_req_header("x-slack-request-timestamp", @example_timestamp)
-        |> put_req_header("x-slack-signature", @example_signature)
-        |> Router.call(@opts)
+    test "returns when successful" do
+      with_mock Manager, compliment: fn _ -> :ok end do
+        conn =
+          conn(:post, "/", @example_body)
+          |> put_req_header("content-type", "application/x-www-form-urlencoded")
+          |> put_req_header("x-slack-request-timestamp", @example_timestamp)
+          |> put_req_header("x-slack-signature", @example_signature)
+          |> Router.call(@opts)
 
-      assert conn.state == :sent
-      assert conn.status == 200
-      assert conn.resp_body =~ "Success"
+        assert conn.state == :sent
+        assert conn.status == 200
+      end
     end
 
     test "returns error when missing headers" do
-      conn =
-        conn(:post, "/", @example_body)
-        |> put_req_header("content-type", "application/x-www-form-urlencoded")
-        |> Router.call(@opts)
+      with_mock Manager, compliment: fn _ -> :ok end do
+        conn =
+          conn(:post, "/", @example_body)
+          |> put_req_header("content-type", "application/x-www-form-urlencoded")
+          |> Router.call(@opts)
 
-      assert conn.state == :sent
-      assert conn.status == 200
-      assert conn.resp_body =~ "error"
+        assert conn.state == :sent
+        assert conn.status == 200
+        assert conn.resp_body =~ "error"
+      end
     end
 
     test "returns error when incorrectly signed" do
-      conn =
-        conn(:post, "/", @example_body)
-        |> put_req_header("content-type", "application/x-www-form-urlencoded")
-        |> put_req_header("x-slack-request-timestamp", @example_timestamp)
-        |> put_req_header("x-slack-signature", @example_signature <> "a")
-        |> Router.call(@opts)
+      with_mock Manager, compliment: fn _ -> :ok end do
+        conn =
+          conn(:post, "/", @example_body)
+          |> put_req_header("content-type", "application/x-www-form-urlencoded")
+          |> put_req_header("x-slack-request-timestamp", @example_timestamp)
+          |> put_req_header("x-slack-signature", @example_signature <> "a")
+          |> Router.call(@opts)
 
-      assert conn.state == :sent
-      assert conn.status == 200
-      assert conn.resp_body =~ "error"
+        assert conn.state == :sent
+        assert conn.status == 200
+        assert conn.resp_body =~ "error"
+      end
     end
   end
 end
