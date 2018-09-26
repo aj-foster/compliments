@@ -5,7 +5,13 @@ defmodule Slack.Router do
   alias Slack.Request
 
   plug(Plug.Logger)
-  plug(Plug.Parsers, parsers: [:json, :urlencoded], json_decoder: Poison)
+
+  plug(Plug.Parsers,
+    parsers: [:json, :urlencoded],
+    body_reader: {Slack.Reader, :read_body, []},
+    json_decoder: Poison
+  )
+
   plug(:match)
   plug(:dispatch)
 
@@ -33,7 +39,7 @@ defmodule Slack.Router do
         send_resp(conn, 200, "The command could not be completed (error: missing header)")
 
       {:error, :invalid_signature} ->
-        send_resp(conn, 200, "The command could not be completed (error: inalid signature)")
+        send_resp(conn, 200, "The command could not be completed (error: invalid signature)")
 
       {:error, reason} ->
         send_resp(conn, 200, "The command could not be completed (error: #{to_string(reason)})")
