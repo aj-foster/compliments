@@ -4,6 +4,8 @@ defmodule Manager do
   """
   use GenServer
 
+  alias Manager.Request
+
   @doc """
   Handle an incoming compliment command.
 
@@ -30,25 +32,21 @@ defmodule Manager do
   end
 
   # Extract necessary information from Slack's request.
-  @spec parse_params(map()) :: {:ok, map()} | {:error, :invalid_params}
+  @spec parse_params(map()) :: {:ok, Request.t()} | {:error, :invalid_params}
   defp parse_params(params) do
     with {:ok, "/compliment"} <- Map.fetch(params, "command"),
          {:ok, response_url} <- Map.fetch(params, "response_url"),
          {:ok, text} <- Map.fetch(params, "text"),
          {:ok, user_id} <- Map.fetch(params, "user_id") do
-      {:ok, %{response_url: response_url, text: text, user_id: user_id}}
+      {:ok, %Request{response_url: response_url, text: text, user_id: user_id}}
     else
       :error -> {:error, :invalid_params}
     end
   end
 
   # Extract necessary information from the /compliment [text].
-  @spec parse_text(map()) :: {:ok, map()} | {:ok, :help} | {:error, :invalid_text}
-  defp parse_text(params) do
-    text =
-      params
-      |> Map.fetch!(:text)
-
+  @spec parse_text(Request.t()) :: {:ok, Request.t()} | {:ok, :help} | {:error, :invalid_text}
+  defp parse_text(%{text: text} = params) do
     cond do
       String.match?(text, ~r/^\s*help/) ->
         respond_with_help(params)
@@ -60,7 +58,7 @@ defmodule Manager do
     end
   end
 
-  @spec respond_with_help(%{response_url: binary()}) :: {:ok, HTTPoison.Response.t()}
+  @spec respond_with_help(Request.t()) :: {:ok, HTTPoison.Response.t()}
   defp respond_with_help(%{response_url: url}) do
     help = """
     {
@@ -72,7 +70,7 @@ defmodule Manager do
     HTTPoison.post(url, help, [{"Content-Type", "application/json"}])
   end
 
-  @spec respond_with_error(%{response_url: binary()}) :: {:ok, HTTPoison.Response.t()}
+  @spec respond_with_error(Request.t()) :: {:ok, HTTPoison.Response.t()}
   defp respond_with_error(%{response_url: url}) do
     help = """
     {

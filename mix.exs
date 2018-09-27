@@ -17,7 +17,10 @@ defmodule Compliments.MixProject do
   defp deps do
     [
       # Releases
-      {:distillery, "~> 2.0"}
+      {:distillery, "~> 2.0"},
+
+      # Testing and typing
+      {:dialyxir, "~> 1.0.0-rc.3", only: [:dev], runtime: false}
     ]
   end
 end

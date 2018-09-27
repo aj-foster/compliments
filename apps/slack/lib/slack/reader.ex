@@ -8,6 +8,7 @@ defmodule Slack.Reader do
   @doc """
   Read the request body and cache it for use later.
   """
+  @spec read_body(Plug.Conn.t(), Keyword.t()) :: {:ok, binary(), Plug.Conn.t()}
   def read_body(conn, opts) do
     {:ok, body, conn} = Plug.Conn.read_body(conn, opts)
     conn = update_in(conn.assigns[:raw_body], &[body | &1 || []])
