@@ -1,6 +1,7 @@
 defmodule ManagerTest do
   use ExUnit.Case
 
+  alias Manager.Response
   import Mock
 
   @help_request %{
@@ -23,18 +24,18 @@ defmodule ManagerTest do
 
   describe "compliment/1" do
     test "sends help message" do
-      with_mock HTTPoison, post: fn _url, _data, _headers -> {:ok, %HTTPoison.Response{}} end do
+      with_mock Response, respond: fn _url, _text -> {:ok, %HTTPoison.Response{}} end do
         Manager.compliment(@help_request)
 
-        assert called(HTTPoison.post(:_, :_, :_))
+        assert called(Response.respond(:_, :_))
       end
     end
 
     test "sends error message" do
-      with_mock HTTPoison, post: fn _url, _data, _headers -> {:ok, %HTTPoison.Response{}} end do
+      with_mock Response, respond: fn _url, _text -> {:ok, %HTTPoison.Response{}} end do
         Manager.compliment(@error_request)
 
-        assert called(HTTPoison.post(:_, :_, :_))
+        assert called(Response.respond(:_, :_))
       end
     end
   end

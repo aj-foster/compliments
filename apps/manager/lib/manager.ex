@@ -4,7 +4,7 @@ defmodule Manager do
   """
   use GenServer
 
-  alias Manager.Request
+  alias Manager.{Request, Response}
 
   @doc """
   Handle an incoming compliment command.
@@ -61,25 +61,19 @@ defmodule Manager do
   @spec respond_with_help(Request.t()) :: {:ok, HTTPoison.Response.t()}
   defp respond_with_help(%{response_url: url}) do
     help = """
-    {
-      "response_type": "ephemeral",
-      "text": "Example: `/compliment @JaneDoe Your work on our latest project was impressive...`"
-    }
+    Example: `/compliment @JaneDoe Your work on our latest project was impressive...`
     """
 
-    HTTPoison.post(url, help, [{"Content-Type", "application/json"}])
+    Response.respond(url, help)
   end
 
   @spec respond_with_error(Request.t()) :: {:ok, HTTPoison.Response.t()}
   defp respond_with_error(%{response_url: url}) do
-    help = """
-    {
-      "response_type": "ephemeral",
-      "text": "Example: `/compliment @JaneDoe Your work on our latest project was impressive...`"
-    }
+    error = """
+    Example: `/compliment @JaneDoe Your work on our latest project was impressive...`
     """
 
-    HTTPoison.post(url, help, [{"Content-Type", "application/json"}])
+    Response.respond(url, error)
   end
 
   # Start a GenServer with the Module's name.

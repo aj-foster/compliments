@@ -2,7 +2,7 @@ defmodule Slack.ResponseTest do
   use ExUnit.Case, async: true
   use Plug.Test
 
-  alias Slack.Response
+  alias Manager.Response
   import Mock
 
   @response_url "https://hooks.slack.com/commands/T01234567/012345678901/AbcDEfGHiJklmNOpqeSTUVWX"

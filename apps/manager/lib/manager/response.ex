@@ -1,4 +1,4 @@
-defmodule Slack.Response do
+defmodule Manager.Response do
   @doc """
   Use the given response URL to post a message.
 
