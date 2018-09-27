@@ -26,9 +26,13 @@ defmodule Slack.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      # Receiving requests.
       {:cowboy, "~> 2.4"},
       {:plug, "~> 1.6"},
       {:poison, "~> 4.0"},
+
+      # Sending responses and Slack messages.
+      {:httpoison, "~> 1.0"},
 
       # Umbrella sibling
       {:manager, in_umbrella: true},
