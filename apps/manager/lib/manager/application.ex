@@ -6,10 +6,13 @@ defmodule Manager.Application do
       %{
         id: Manager,
         start: {Manager, :start_link, []}
+      },
+      %{
+        id: Manager.User,
+        start: {Manager.User, :start_link, []}
       }
     ]
 
-    Manager.User.init()
     Supervisor.start_link(children, strategy: :one_for_one)
   end
 end
