@@ -9,6 +9,7 @@ defmodule Manager.Application do
       }
     ]
 
+    Manager.User.init()
     Supervisor.start_link(children, strategy: :one_for_one)
   end
 end
