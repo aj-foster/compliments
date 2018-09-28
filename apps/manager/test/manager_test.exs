@@ -36,7 +36,17 @@ defmodule ManagerTest do
     "response_url" =>
       "https://hooks.slack.com/commands/T01234567/012345678901/AbcDEfGHiJklmNOpqeSTUVWX",
     "team_id" => "T01234567",
-    "text" => "  <@U76543210|person-name>  Msg <with> weird ! @ # $ % ^ & * ( ) chars\n\n\t etc",
+    "text" =>
+      "  <@U76543210|some-name>  Msg <w> weird <@UABCDEFGH|name> ! @ # $ % ^ & * ( ) chars\n\n\t etc",
+    "user_id" => "U01234567"
+  }
+
+  @request_with_mention %{
+    "command" => "/compliment",
+    "response_url" =>
+      "https://hooks.slack.com/commands/T01234567/012345678901/AbcDEfGHiJklmNOpqeSTUVWX",
+    "team_id" => "T01234567",
+    "text" => "<@U76543210|some-name> You and <@UABCDEFGH|name> rock!",
     "user_id" => "U01234567"
   }
 
@@ -65,9 +75,9 @@ defmodule ManagerTest do
           direct_message: fn _user_id, _message -> :ok end do
           Manager.compliment(@normal_request)
 
-          assert called(Response.respond(:_, :_))
-          assert called(Response.post_compliment(:_, :_, :_))
-          assert called(Response.direct_message(:_, :_))
+          assert_called(Response.respond(:_, :_))
+          assert_called(Response.post_compliment(:_, :_, :_))
+          assert_called(Response.direct_message(:_, :_))
         end
       end
     end
@@ -80,9 +90,24 @@ defmodule ManagerTest do
           direct_message: fn _user_id, _message -> :ok end do
           Manager.compliment(@odd_request)
 
-          assert called(Response.respond(:_, :_))
+          assert_called(Response.respond(:_, :_))
           assert_called(Response.post_compliment(:_, :_, :_))
-          assert called(Response.direct_message(:_, :_))
+          assert_called(Response.direct_message(:_, :_))
+        end
+      end
+    end
+
+    test "handles request with a mention" do
+      with_mock User, get_name: fn _user_id -> {:ok, "Jane Doe"} end do
+        with_mock Response,
+          respond: fn _url, _text -> {:ok, %HTTPoison.Response{}} end,
+          post_compliment: fn _from, _to, _compliment -> :ok end,
+          direct_message: fn _user_id, _message -> :ok end do
+          Manager.compliment(@request_with_mention)
+
+          assert_called(Response.respond(:_, :_))
+          assert_called(Response.post_compliment(:_, :_, "You and <@UABCDEFGH|name> rock!"))
+          assert_called(Response.direct_message(:_, :_))
         end
       end
     end

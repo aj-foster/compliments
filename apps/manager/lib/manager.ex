@@ -6,7 +6,7 @@ defmodule Manager do
 
   alias Manager.{Request, Response, User}
 
-  @compliment_regex ~r/\s*\<@(?<user>U[0-9A-Z]+)(|.*)\>\s+(?<compliment>[\s\S]*)$/
+  @compliment_regex ~r/^\s*\<@(?<user>U[0-9A-Z]+)(\|[^>]*)?\>\s+(?<compliment>[\s\S]*)$/
 
   @help_text """
   Example: `/compliment @JaneDoe Your work on our latest project was impressive...`
@@ -91,7 +91,7 @@ defmodule Manager do
   # Extract necessary information from the /compliment [text].
   @spec parse_text(Request.t()) :: {:ok, Request.t()} | {:ok, :help} | {:error, :invalid_text}
   defp parse_text(%{text: text} = params) do
-    matches = Regex.named_captures(@compliment_regex, text)
+    matches = Regex.named_captures(@compliment_regex, text, capture: :first)
 
     cond do
       String.match?(text, ~r/^\s*help/) ->
