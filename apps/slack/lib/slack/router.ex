@@ -33,7 +33,7 @@ defmodule Slack.Router do
   post "/" do
     with {body, timestamp, signature} <- Request.read_and_parse(conn),
          :ok <- Request.verify(body, timestamp, signature) do
-      Manager.compliment(conn.params)
+      Manager.run(conn.params)
       send_resp(conn, 200, "")
     else
       {:error, :missing_header} ->

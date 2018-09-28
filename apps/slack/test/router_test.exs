@@ -57,7 +57,7 @@ defmodule Slack.RouterTest do
 
   describe "POST /" do
     test "returns when successful" do
-      with_mock Manager, compliment: fn _ -> :ok end do
+      with_mock Manager, run: fn _ -> :ok end do
         conn =
           conn(:post, "/", @example_body)
           |> put_req_header("content-type", "application/x-www-form-urlencoded")
@@ -71,7 +71,7 @@ defmodule Slack.RouterTest do
     end
 
     test "returns error when missing headers" do
-      with_mock Manager, compliment: fn _ -> :ok end do
+      with_mock Manager, run: fn _ -> :ok end do
         conn =
           conn(:post, "/", @example_body)
           |> put_req_header("content-type", "application/x-www-form-urlencoded")
@@ -84,7 +84,7 @@ defmodule Slack.RouterTest do
     end
 
     test "returns error when incorrectly signed" do
-      with_mock Manager, compliment: fn _ -> :ok end do
+      with_mock Manager, run: fn _ -> :ok end do
         conn =
           conn(:post, "/", @example_body)
           |> put_req_header("content-type", "application/x-www-form-urlencoded")
