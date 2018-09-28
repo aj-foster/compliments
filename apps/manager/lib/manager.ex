@@ -6,6 +6,8 @@ defmodule Manager do
 
   alias Manager.{Request, Response}
 
+  @compliment_regex ~r/\s*\<@(?<user>U[0-9A-F]+)(|.*)\>\s+(?<compliment>[\s\S]*)$/
+
   @doc """
   Handle an incoming compliment command.
 
@@ -38,7 +40,7 @@ defmodule Manager do
          {:ok, response_url} <- Map.fetch(params, "response_url"),
          {:ok, text} <- Map.fetch(params, "text"),
          {:ok, user_id} <- Map.fetch(params, "user_id") do
-      {:ok, %Request{response_url: response_url, text: text, user_id: user_id}}
+      {:ok, %Request{response_url: response_url, text: text, from: user_id}}
     else
       :error -> {:error, :invalid_params}
     end
@@ -47,10 +49,18 @@ defmodule Manager do
   # Extract necessary information from the /compliment [text].
   @spec parse_text(Request.t()) :: {:ok, Request.t()} | {:ok, :help} | {:error, :invalid_text}
   defp parse_text(%{text: text} = params) do
+    matches = Regex.named_captures(@compliment_regex, text)
+
     cond do
       String.match?(text, ~r/^\s*help/) ->
         respond_with_help(params)
         {:ok, :help}
+
+      is_map(matches) ->
+        {:ok, to} = Map.fetch(matches, :user)
+        {:ok, compliment} = Map.fetch(matches, :compliment)
+
+        {:ok, %Request{params | to: to, compliment: compliment}}
 
       true ->
         respond_with_error(params)

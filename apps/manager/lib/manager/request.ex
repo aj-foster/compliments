@@ -1,5 +1,5 @@
 defmodule Manager.Request do
-  @enforce_keys [:response_url, :text, :user_id]
-  defstruct [:response_url, :text, :user_id]
+  @enforce_keys [:response_url, :text, :from]
+  defstruct [:response_url, :text, :from, :to, :compliment]
   @type t :: %__MODULE__{}
 end
