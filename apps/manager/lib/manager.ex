@@ -8,6 +8,10 @@ defmodule Manager do
 
   @compliment_regex ~r/\s*\<@(?<user>U[0-9A-Z]+)(|.*)\>\s+(?<compliment>[\s\S]*)$/
 
+  @help_text """
+  Example: `/compliment @JaneDoe Your work on our latest project was impressive...`
+  """
+
   @doc """
   Handle an incoming compliment command.
 
@@ -39,17 +43,34 @@ defmodule Manager do
       :ok
     else
       {:ok, :help} ->
-        respond_with_help(params)
+        Response.respond(params["response_url"], @help_text)
         :ok
 
       {:error, :invalid_text} ->
-        respond_with_error(params)
+        Response.respond(params["response_url"], """
+        We couldn't interpret your compliment. Please ensure it follows this example:
+
+        ```
+        /compliment @JaneDoe Your work on our latest project was impressive...
+        ```
+        """)
+
         :error
 
       {:error, :invalid_params} ->
+        Response.respond(
+          params["response_url"],
+          "An error occurred while posting your compliment (`invalid_params`)"
+        )
+
         :error
 
       :error ->
+        Response.respond(
+          params["response_url"],
+          "An error occurred while posting your compliment (`general error`)"
+        )
+
         :error
     end
   end
@@ -85,24 +106,6 @@ defmodule Manager do
       true ->
         {:error, :invalid_text}
     end
-  end
-
-  @spec respond_with_help(Request.t()) :: {:ok, HTTPoison.Response.t()}
-  defp respond_with_help(%{response_url: url}) do
-    help = """
-    Example: `/compliment @JaneDoe Your work on our latest project was impressive...`
-    """
-
-    Response.respond(url, help)
-  end
-
-  @spec respond_with_error(Request.t()) :: {:ok, HTTPoison.Response.t()}
-  defp respond_with_error(%{response_url: url}) do
-    error = """
-    Example: `/compliment @JaneDoe Your work on our latest project was impressive...`
-    """
-
-    Response.respond(url, error)
   end
 
   # Start a GenServer with the Module's name.
