@@ -39,9 +39,9 @@ defmodule Manager.User do
   defp get_cached_name(table, user_id) do
     with [{^user_id, name, expiration}] <- :ets.lookup(table, user_id),
          false <- past_expiration?(expiration) do
-      name
+      {:ok, name}
     else
-      _ -> :cache_miss
+      _ -> {:error, :cache_miss}
     end
   end
 
@@ -62,7 +62,7 @@ defmodule Manager.User do
          %{"user" => user} <- data,
          %{"profile" => profile} <- user,
          %{"real_name" => name} <- profile do
-      name
+      {:ok, name}
     else
       _ -> :error
     end
@@ -114,15 +114,16 @@ defmodule Manager.User do
 
   @impl GenServer
   def handle_call({:get_name, user_id}, _from, table) do
-    case get_cached_name(table, user_id) do
-      name when is_binary(name) ->
-        {:reply, name, table}
+    with {:error, :cache_miss} <- get_cached_name(table, user_id),
+         {:ok, name} <- get_name_from_api(user_id) do
+      cache_name(table, user_id, name)
+      {:reply, {:ok, name}, table}
+    else
+      {:ok, name} ->
+        {:reply, {:ok, name}, table}
 
-      _ ->
-        name = get_name_from_api(user_id)
-        cache_name(table, user_id, name)
-
-        {:reply, name, table}
+      :error ->
+        {:reply, :error, table}
     end
   end
 

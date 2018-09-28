@@ -71,7 +71,7 @@ defmodule Manager.UserTest do
         User.clear_cache()
         name = User.get_name("U01234567")
 
-        assert name == "Jane Doe"
+        assert name == {:ok, "Jane Doe"}
       end
     end
 
