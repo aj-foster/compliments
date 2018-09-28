@@ -58,7 +58,7 @@ end
 # will be used by default
 
 release :compliments do
-  set(version: "0.0.2")
+  set(version: "0.1.0")
 
   set(
     applications: [
