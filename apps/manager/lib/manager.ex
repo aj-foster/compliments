@@ -4,7 +4,7 @@ defmodule Manager do
   """
   use GenServer
 
-  alias Manager.{Request, Response}
+  alias Manager.{Request, Response, User}
 
   @compliment_regex ~r/\s*\<@(?<user>U[0-9A-F]+)(|.*)\>\s+(?<compliment>[\s\S]*)$/
 
@@ -23,8 +23,11 @@ defmodule Manager do
   """
   @spec compliment(map()) :: :ok | :error
   def compliment(params) do
-    with {:ok, params} <- parse_params(params),
-         {:ok, %{}} <- parse_text(params) do
+    with {:ok, %Request{} = request} <- parse_params(params),
+         {:ok, %Request{} = request} <- parse_text(request),
+         {:ok, sender_name} <- User.get_name(request[:from]),
+         {:ok, recipient_name} <- User.get_name(request[:to]) do
+      IO.puts("#{sender_name} complimented #{recipient_name}: #{request[:compliment]}")
       :ok
     else
       {:error, :invalid_params} -> :error
