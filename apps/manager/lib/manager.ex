@@ -6,7 +6,7 @@ defmodule Manager do
 
   alias Manager.{Request, Response, User}
 
-  @compliment_regex ~r/\s*\<@(?<user>U[0-9A-F]+)(|.*)\>\s+(?<compliment>[\s\S]*)$/
+  @compliment_regex ~r/\s*\<@(?<user>U[0-9A-Z]+)(|.*)\>\s+(?<compliment>[\s\S]*)$/
 
   @doc """
   Handle an incoming compliment command.
@@ -25,14 +25,15 @@ defmodule Manager do
   def compliment(params) do
     with {:ok, %Request{} = request} <- parse_params(params),
          {:ok, %Request{} = request} <- parse_text(request),
-         {:ok, sender_name} <- User.get_name(request[:from]),
-         {:ok, recipient_name} <- User.get_name(request[:to]) do
-      IO.puts("#{sender_name} complimented #{recipient_name}: #{request[:compliment]}")
+         {:ok, sender_name} <- User.get_name(request.from),
+         {:ok, recipient_name} <- User.get_name(request.to) do
+      IO.puts("#{sender_name} complimented #{recipient_name}: #{request.compliment}")
       :ok
     else
       {:error, :invalid_params} -> :error
       {:ok, :help} -> :ok
       {:error, :invalid_text} -> :error
+      :error -> :error
     end
   end
 
@@ -60,8 +61,8 @@ defmodule Manager do
         {:ok, :help}
 
       is_map(matches) ->
-        {:ok, to} = Map.fetch(matches, :user)
-        {:ok, compliment} = Map.fetch(matches, :compliment)
+        {:ok, to} = Map.fetch(matches, "user")
+        {:ok, compliment} = Map.fetch(matches, "compliment")
 
         {:ok, %Request{params | to: to, compliment: compliment}}
 
