@@ -31,6 +31,14 @@ defmodule Manager.Response do
 
   def respond(_url, _text, _opts), do: {:error, :invalid_url}
 
+  @doc """
+  Send a compliment message via Slack Incoming Webhook.
+
+  The channel to which the compliment is posted will be determined by
+  the user installing the application. This request requires a webhook
+  URL, configured via `config :slack, webhook: "..."`.
+  """
+  @spec post_compliment(binary(), binary(), binary()) :: :ok | :error
   def post_compliment(from, to, compliment) do
     body = %{
       "text" => "*#{from}* complimented *#{to}*:",
@@ -47,8 +55,7 @@ defmodule Manager.Response do
          "ok" <- response.body do
       :ok
     else
-      # _ -> :error
-      x -> IO.inspect(x, label: "ERROR")
+      _ -> :error
     end
   end
 
@@ -80,6 +87,14 @@ defmodule Manager.Response do
   #   end
   # end
 
+  @doc """
+  Send a direct message to a Slack user.
+
+  We intend this to be used as a notification to the recipient
+  of a compliment. This requires the `chat:write:bot` permission
+  and will post all messages as the application.
+  """
+  @spec direct_message(binary(), binary()) :: :ok | :error
   def direct_message(user_id, message) do
     url = "https://slack.com/api/chat.postMessage"
     token = Application.get_env(:slack, :oauth_token)
@@ -95,7 +110,9 @@ defmodule Manager.Response do
     ]
 
     with {:ok, body} <- Poison.encode(body),
-         {:ok, _} <- HTTPoison.post(url, body, headers) do
+         {:ok, response} <- HTTPoison.post(url, body, headers),
+         {:ok, resp_body} <- Poison.decode(response.body),
+         %{"ok" => "true"} <- resp_body do
       :ok
     else
       _ -> :error

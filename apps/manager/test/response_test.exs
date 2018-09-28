@@ -36,4 +36,45 @@ defmodule Slack.ResponseTest do
       end
     end
   end
+
+  describe "post_compliment/3" do
+    test "posts a compliment" do
+      response = {:ok, %HTTPoison.Response{body: "ok"}}
+
+      with_mock HTTPoison, post: fn _url, _data, _headers -> response end do
+        assert Response.post_compliment("John Doe", "Jane Doe", "Compliment") == :ok
+        assert_called(HTTPoison.post(:_, :_, :_))
+      end
+    end
+
+    test "handles a post error" do
+      response = {:ok, %HTTPoison.Response{body: "channel_is_archived", status_code: 410}}
+
+      with_mock HTTPoison, post: fn _url, _data, _headers -> response end do
+        assert Response.post_compliment("John Doe", "Jane Doe", "Compliment") == :error
+        assert_called(HTTPoison.post(:_, :_, :_))
+      end
+    end
+  end
+
+  describe "direct_message/2" do
+    test "sends a message" do
+      response = {:ok, %HTTPoison.Response{body: "{\"ok\": \"true\"}"}}
+
+      with_mock HTTPoison, post: fn _url, _data, _headers -> response end do
+        assert Response.direct_message("U01234567", "Compliment") == :ok
+        assert_called(HTTPoison.post(:_, :_, :_))
+      end
+    end
+
+    test "handles a post error" do
+      response =
+        {:ok, %HTTPoison.Response{body: "{\"ok\": \"false\", \"error\": \"channel_not_found\"}"}}
+
+      with_mock HTTPoison, post: fn _url, _data, _headers -> response end do
+        assert Response.direct_message("U01234567", "Compliment") == :error
+        assert_called(HTTPoison.post(:_, :_, :_))
+      end
+    end
+  end
 end
