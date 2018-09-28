@@ -25,15 +25,32 @@ defmodule Manager do
   def compliment(params) do
     with {:ok, %Request{} = request} <- parse_params(params),
          {:ok, %Request{} = request} <- parse_text(request),
-         {:ok, sender_name} <- User.get_name(request.from),
-         {:ok, recipient_name} <- User.get_name(request.to) do
-      IO.puts("#{sender_name} complimented #{recipient_name}: #{request.compliment}")
+         {:ok, compliment} <- Map.fetch(request, :compliment),
+         {:ok, sender} <- User.get_name(request.from),
+         {:ok, recipient} <- User.get_name(request.to),
+         :ok <- Response.post_compliment(sender, recipient, compliment) do
+      Response.respond(request.response_url, "Thank you! Your compliment has been posted.")
+
+      Response.direct_message(
+        request.to,
+        "#{sender} gave you a compliment in the compliments channel."
+      )
+
       :ok
     else
-      {:error, :invalid_params} -> :error
-      {:ok, :help} -> :ok
-      {:error, :invalid_text} -> :error
-      :error -> :error
+      {:ok, :help} ->
+        respond_with_help(params)
+        :ok
+
+      {:error, :invalid_text} ->
+        respond_with_error(params)
+        :error
+
+      {:error, :invalid_params} ->
+        :error
+
+      :error ->
+        :error
     end
   end
 
@@ -57,7 +74,6 @@ defmodule Manager do
 
     cond do
       String.match?(text, ~r/^\s*help/) ->
-        respond_with_help(params)
         {:ok, :help}
 
       is_map(matches) ->
@@ -67,7 +83,6 @@ defmodule Manager do
         {:ok, %Request{params | to: to, compliment: compliment}}
 
       true ->
-        respond_with_error(params)
         {:error, :invalid_text}
     end
   end
