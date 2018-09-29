@@ -47,7 +47,7 @@ defmodule Manager.Response do
       ]
     }
 
-    url = Application.get_env(:slack, :webhook)
+    url = Application.fetch_env!(:manager, :webhook)
     {:ok, body} = Poison.encode(body)
     headers = [{"Content-Type", "application/json"}]
 
@@ -61,7 +61,7 @@ defmodule Manager.Response do
 
   # def post_compliment(from, to, message) do
   #   url = "https://slack.com/api/chat.postMessage"
-  #   token = Application.get_env(:slack, :oauth_token)
+  #   token = Application.fetch_env!(:manager, :oauth_token)
 
   #   body = %{
   #     # "channel" => "??????"
@@ -97,7 +97,7 @@ defmodule Manager.Response do
   @spec direct_message(binary(), binary()) :: :ok | :error
   def direct_message(user_id, message) do
     url = "https://slack.com/api/chat.postMessage"
-    token = Application.get_env(:slack, :oauth_token)
+    token = Application.fetch_env!(:manager, :oauth_token)
 
     body = %{
       "channel" => user_id,

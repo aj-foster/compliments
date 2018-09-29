@@ -50,7 +50,7 @@ defmodule Manager.User do
   defp get_name_from_api(user_id) do
     url = "https://slack.com/api/users.info"
     params = "user=#{user_id}"
-    token = Application.get_env(:slack, :oauth_token)
+    token = Application.fetch_env!(:manager, :oauth_token)
 
     headers = [
       {"Content-Type", "application/x-www-form-urlencoded"},
