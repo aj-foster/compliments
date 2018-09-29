@@ -59,34 +59,6 @@ defmodule Manager.Response do
     end
   end
 
-  # def post_compliment(from, to, message) do
-  #   url = "https://slack.com/api/chat.postMessage"
-  #   token = Application.fetch_env!(:manager, :oauth_token)
-
-  #   body = %{
-  #     # "channel" => "??????"
-  #     "text" => "*#{from}* complimented *#{to}*:",
-  #     "attachments" => [
-  #       %{"text" => message, "color" => "#F15B51"}
-  #     ]
-  #   }
-
-  #   headers = [
-  #     {"Content-Type", "application/json"},
-  #     {"Authorization", "Bearer #{token}"}
-  #   ]
-
-  #   with {:ok, body} <- Poison.encode(body),
-  #        {:ok, response} <- HTTPoison.post(url, body, headers),
-  #        {:ok, resp_body} <- Poison.decode(response.body),
-  #        %{"ok" => "true"} <- response,
-  #        %{"channel" => channel} <- response do
-  #     {:ok, channel}
-  #   else
-  #     x -> IO.inspect(x, label: "ERROR")
-  #   end
-  # end
-
   @doc """
   Send a direct message to a Slack user.
 
