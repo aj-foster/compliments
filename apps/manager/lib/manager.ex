@@ -12,6 +12,10 @@ defmodule Manager do
   Example: `/compliment @JaneDoe Your work on our latest project was impressive...`
   """
 
+  ##############
+  # Client API #
+  ##############
+
   @doc """
   Handle an incoming compliment command.
 
@@ -21,6 +25,10 @@ defmodule Manager do
   def run(params) do
     GenServer.cast(__MODULE__, {:compliment, params})
   end
+
+  ###########
+  # Helpers #
+  ###########
 
   @doc """
   Accepts compliment command parameters, validates, and reacts.
@@ -110,6 +118,10 @@ defmodule Manager do
         {:error, :invalid_text}
     end
   end
+
+  ##############
+  # Server API #
+  ##############
 
   # Start a GenServer with the Module's name.
   def start_link() do
