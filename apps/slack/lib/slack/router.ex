@@ -19,8 +19,6 @@ defmodule Slack.Router do
   get "/" do
     send_resp(conn, 200, """
     This application provides a `/compliment` command for Slack workspaces.
-
-    If you have questions, please contact AJ Foster.
     """)
   end
 
