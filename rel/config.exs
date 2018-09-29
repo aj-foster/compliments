@@ -36,7 +36,10 @@ end
 environment :prod do
   set(include_erts: true)
   set(include_src: false)
-  set(cookie: :"!k`]AQ<wPHq55,TpZ{ef)LEE/6|vgw9~Kl]htAD$T.S_)0bD8`WB895,xLE$*vG=")
+
+  set(
+    cookie: :crypto.hash(:sha256, System.get_env("COOKIE")) |> Base.encode16() |> String.to_atom()
+  )
 
   # Runtime configuration
   set(

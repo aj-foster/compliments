@@ -85,8 +85,10 @@ Once in the environment, build the application with
 
 ```
 mix deps.get
-MIX_ENV=prod mix release
+COOKIE="some secret here" MIX_ENV=prod mix release
 ```
+
+replacing the `COOKIE` value with a secret key. The text will be SHA-256 hashed and base16 encoded before being passed to the Erlang VM during application startup.
 
 All of the files necessary to run the application can be found in `_build/prod/rel/compliments/releases/<version>/compliments.tar.gz`. Copying the files to the host, and unpack them where appropriate.
 
