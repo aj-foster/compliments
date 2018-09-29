@@ -33,11 +33,14 @@ defmodule Manager do
          {:ok, sender} <- User.get_name(request.from),
          {:ok, recipient} <- User.get_name(request.to),
          :ok <- Response.post_compliment(sender, recipient, compliment) do
-      Response.respond(request.response_url, "Thank you! Your compliment has been posted.")
+      Response.respond(
+        request.response_url,
+        "Thank you for sharing your appreciation! Your compliment has been posted."
+      )
 
       Response.direct_message(
         request.to,
-        "#{sender} gave you a compliment in the compliments channel."
+        "#{sender} gave you a compliment in the compliments channel. Yay!"
       )
 
       :ok
