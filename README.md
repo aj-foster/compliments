@@ -64,6 +64,7 @@ Using these values, fill in `rel/config/config.exs` in this format:
 use Mix.Config
 
 config :slack,
+  port: 4000,
   shared_secret: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
 config :manager,
@@ -71,6 +72,8 @@ config :manager,
   webhook: "https://hooks.slack.com/services/TXXXXXXXX/BXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX"
 
 ```
+
+We can also configure the listening port using the `port` setting.
 
 **Step three: Deploy the application**
 
