@@ -58,7 +58,7 @@ end
 # will be used by default
 
 release :compliments do
-  set(version: "0.1.0")
+  set(version: current_version(:slack))
 
   set(
     applications: [
