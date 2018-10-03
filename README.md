@@ -52,28 +52,22 @@ OAuth & Permisions (Scopes):
 
 **Step two: Copy secrets**
 
-After configuring the application in the Slack workspace, we now need to copy several secrets to the configuration of the app. Here are the items we'll need from the Slack interface:
+After configuring the application in the Slack workspace, we now need to copy several secrets. We will present these secrets as environment variables at runtime.
 
 * Signing Secret: `XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX`
 * Webhook URL: `https://hooks.slack.com/services/TXXXXXXXX/BXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX`
 * OAuth Access Token: `xoxp-xxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
 
-Using these values, fill in `rel/config/config.exs` in this format:
-
-```elixir
-use Mix.Config
-
-config :slack,
-  port: 4000,
-  shared_secret: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-
-config :manager,
-  oauth_token: "xoxp-xxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-  webhook: "https://hooks.slack.com/services/TXXXXXXXX/BXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX"
+Using these values, export the following variables at runtime:
 
 ```
-
-We can also configure the listening port using the `port` setting.
+REPLACE_OS_VARS=true
+ERLANG_COOKIE="any-cookie-you-want"
+PORT=4000  # Or whatever you wish
+SLACK_SHARED_SECRET="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+SLACK_OAUTH_TOKEN="xoxp-xxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+SLACK_WEBHOOK="https://hooks.slack.com/services/TXXXXXXXX/BXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX"
+```
 
 **Step three: Deploy the application**
 
@@ -85,16 +79,14 @@ Once in the environment, build the application with
 
 ```
 mix deps.get
-COOKIE="some secret here" MIX_ENV=prod mix release
+MIX_ENV=prod mix release
 ```
-
-replacing the `COOKIE` value with a secret key. The text will be SHA-256 hashed and base16 encoded before being passed to the Erlang VM during application startup.
 
 All of the files necessary to run the application can be found in `_build/prod/rel/compliments/releases/<version>/compliments.tar.gz`. Copying the files to the host, and unpack them where appropriate.
 
 **Step four: Start the application**
 
-The application can be manually started with `bin/compliments start`.
+The application can be manually started with `bin/compliments start` with the relevant environment variables.
 
 See [this page](https://hexdocs.pm/distillery/guides/systemd.html) and related pages for information about starting the application with `systemd` and other methods.
 
