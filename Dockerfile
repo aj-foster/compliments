@@ -21,7 +21,9 @@ RUN APP_NAME="compliments" && \
     tar -xf "$RELEASE_DIR/$APP_NAME.tar.gz" -C /export
 
 
-FROM erlang:21-alpine
+FROM erlang:21-slim
+
+ENV LC_ALL C.UTF-8
 
 COPY --from=build /export/ .
 
