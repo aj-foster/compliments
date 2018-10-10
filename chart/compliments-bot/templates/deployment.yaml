@@ -26,19 +26,19 @@ spec:
           env:
           - name: SLACK_SHARED_SECRET
             valueFrom:
-            secretKeyRef:
-              name: {{ template "compliments-bot.fullname" . }}
-              key: SLACK_SHARED_SECRET
+              secretKeyRef:
+                name: {{ template "compliments-bot.fullname" . }}
+                key: SLACK_SHARED_SECRET
           - name: SLACK_OAUTH_TOKEN
             valueFrom:
-            secretKeyRef:
-              name: {{ template "compliments-bot.fullname" . }}
-              key: SLACK_OAUTH_TOKEN
+              secretKeyRef:
+                name: {{ template "compliments-bot.fullname" . }}
+                key: SLACK_OAUTH_TOKEN
           - name: SLACK_WEBHOOK
             valueFrom:
-            secretKeyRef:
-              name: {{ template "compliments-bot.fullname" . }}
-              key: SLACK_WEBHOOK
+              secretKeyRef:
+                name: {{ template "compliments-bot.fullname" . }}
+                key: SLACK_WEBHOOK
           - name: REPLACE_OS_VARS
             value: "true"
           {{- if .Values.config.ERLANG_COOKIE }}
@@ -54,11 +54,11 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /
+              path: /health
               port: http
           readinessProbe:
             httpGet:
-              path: /
+              path: /health
               port: http
           resources:
 {{ toYaml .Values.resources | indent 12 }}
