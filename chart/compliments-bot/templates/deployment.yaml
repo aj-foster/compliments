@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "compliments-bot.fullname" . }}
+  labels:
+    app: {{ include "compliments-bot.name" . }}
+    chart: {{ include "compliments-bot.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "compliments-bot.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "compliments-bot.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: SLACK_SHARED_SECRET
+            valueFrom:
+            secretKeyRef:
+              name: {{ template "compliments-bot.fullname" . }}
+              key: SLACK_SHARED_SECRET
+          - name: SLACK_OAUTH_TOKEN
+            valueFrom:
+            secretKeyRef:
+              name: {{ template "compliments-bot.fullname" . }}
+              key: SLACK_OAUTH_TOKEN
+          - name: SLACK_WEBHOOK
+            valueFrom:
+            secretKeyRef:
+              name: {{ template "compliments-bot.fullname" . }}
+              key: SLACK_WEBHOOK
+          - name: REPLACE_OS_VARS
+            value: "true"
+          {{- if .Values.config.ERLANG_COOKIE }}
+          - name: ERLANG_COOKIE
+            value: {{ .Values.config.ERLANG_COOKIE }}
+          {{- else }}
+          - name: ERLANG_COOKIE
+            value: {{ randAlphaNum 32 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 4000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
