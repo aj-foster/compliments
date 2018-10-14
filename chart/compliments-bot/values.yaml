@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: registry.vnerd.com/compliments-bot
-  tag: latest
+  tag: master
   pullPolicy: IfNotPresent
 
 config:
@@ -24,11 +24,11 @@ service:
 
 resources:
   limits:
-   cpu: 100m
-   memory: 128Mi
+   cpu: 250m
+   memory: 512Mi
   requests:
-   cpu: 100m
-   memory: 128Mi
+   cpu: 250m
+   memory: 512Mi
 
 nodeSelector: {}
 
